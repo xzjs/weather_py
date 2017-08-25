@@ -85,7 +85,7 @@ def spider(str):
         print False
 
 
-def search():
+def search(city,info):
     pass
 
 
