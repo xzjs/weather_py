@@ -10,7 +10,7 @@ import zmq
 def spider(str):
     '''爬虫函数'''
     city = str
-    conn = MongoClient('localhost', 27017)
+    conn = MongoClient('172.17.0.1', 27017)
     db = conn.weather
     sysstr = platform.system()
     if sysstr == "Windows":
@@ -83,12 +83,10 @@ def spider(str):
         print Exception, ":", e
         print False
 
+
 def search():
     pass
 
 
 if __name__ == '__main__':
-    # spider('101010100')
-    while True:
-        print 'hello world'
-        time.sleep(10)
+    spider('101010100')
