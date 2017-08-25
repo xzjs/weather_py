@@ -13,6 +13,7 @@ def spider(str):
     conn = MongoClient('172.17.0.1', 27017)
     db = conn.weather
     sysstr = platform.system()
+    print sysstr
     if sysstr == "Windows":
         driver = webdriver.PhantomJS(executable_path="phantomjs.exe")
     else:
