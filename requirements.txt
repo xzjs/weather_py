@@ -1,0 +1,6 @@
+cssselect==1.0.1
+lxml==3.8.0
+pymongo==3.5.0
+pyquery==1.2.17
+pyzmq==16.0.2
+selenium==3.5.0
