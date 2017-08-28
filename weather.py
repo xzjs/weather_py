@@ -17,7 +17,7 @@ def spider(str):
     if sysstr == "Windows":
         driver = webdriver.PhantomJS(executable_path="phantomjs.exe")
     else:
-        driver = webdriver.PhantomJS(executable_path="phantomjs")
+        driver = webdriver.PhantomJS(executable_path="./phantomjs")
 
     try:
         '''今日天气'''
