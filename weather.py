@@ -1,21 +1,26 @@
 # -*- coding:utf-8 -*-
 import time
+
+import pymongo
 from selenium import webdriver
 from pyquery import PyQuery as pq
-from pymongo import MongoClient
 import platform
 import zmq
+
+sysstr = platform.system()
+conn_host = '127.0.0.1' if sysstr == "Windows" else "172.17.0.1"
+conn = pymongo.MongoClient(conn_host, 27017)
+db = conn.weather
 
 
 def spider(str):
     '''爬虫函数'''
     city = str
-    conn = MongoClient('172.17.0.1', 27017)
-    db = conn.weather
     sysstr = platform.system()
     print sysstr
     if sysstr == "Windows":
         driver = webdriver.PhantomJS(executable_path="phantomjs.exe")
+        conn = MongoClient('127.0.0.1', 27017)
     else:
         driver = webdriver.PhantomJS(executable_path="./phantomjs")
 
@@ -85,9 +90,31 @@ def spider(str):
         print False
 
 
-def search(city,info):
-    pass
+def search(city, info, num=15):
+    advices = db.advice.find({"city": city}).sort([("time", -1)])
+    if advices is None or (time.time() - advices[0]['time'] > 3600):
+        spider(city)
+    result = {}
+    for i in info:
+        if i == 'advice':
+            advice = db.advice.find({"city": city}).sort('time', pymongo.ASCENDING).limit(1)
+            for _advice in advice:
+                result['advice'] = _advice
+        if i == 'aqi':
+            pass
+        if i == 'today':
+            today = db.today.find({"city": city}).sort('time', pymongo.ASCENDING).limit(1)
+            for _today in today:
+                result['today'] = _today
+        if i == 'future':
+            future = db.future.find({"city": city}).sort('time', pymongo.ASCENDING).limit(num)
+            array = []
+            for _future in future:
+                array.append(_future)
+            result['future'] = array
+    return result
 
 
 if __name__ == '__main__':
-    spider('101010100')
+    # spider('101010100')
+    print search('101010100', ['advice', 'aqi', 'today', 'future'], 15)
