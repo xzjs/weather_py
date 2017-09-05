@@ -20,7 +20,6 @@ def spider(str):
     print sysstr
     if sysstr == "Windows":
         driver = webdriver.PhantomJS(executable_path="phantomjs.exe")
-        conn = MongoClient('127.0.0.1', 27017)
     else:
         driver = webdriver.PhantomJS(executable_path="./phantomjs")
 
@@ -92,7 +91,7 @@ def spider(str):
 
 def search(city, info, num=15):
     advices = db.advice.find({"city": city}).sort([("time", -1)])
-    if advices is None or (time.time() - advices[0]['time'] > 3600):
+    if advices.count() == 0 or (time.time() - advices[0]['time'] > 3600):
         spider(city)
     result = {}
     for i in info:
