@@ -9,7 +9,8 @@ import platform
 import zmq
 
 sysstr = platform.system()
-conn_host = '127.0.0.1' if sysstr == "Windows" else "172.17.0.1"
+# conn_host = '127.0.0.1' if sysstr == "Windows" else "172.17.0.1"
+conn_host = '111.230.21.59'
 conn = pymongo.MongoClient(conn_host, 27017)
 db = conn.weather
 # zmq
@@ -75,18 +76,6 @@ def spider(str):
         advice['time'] = time.time()
         my_set = db.advice
         my_set.insert(advice)
-
-        # driver.get("http://e.weather.com.cn/d/air/" + city + ".shtml")
-        # doc = pq(driver.page_source)
-        # dls = doc('dl')
-        # l = []
-        # for dl in dls.items():
-        #     l.append(dl.find('dt').text())
-        # sql = "INSERT INTO `spider`.`aqi`(`pm10`,`pm2_5`,`no2`,`so2`,`co`,`o3`,`time`,`city`)VALUES('%s','%s','%s','%s','%s','%s','%s','%s')" % (
-        #     l[0], l[1], l[2], l[3], l[4], l[5], time.time(), city)
-        # cursor.execute(sql)
-        # db.commit()
-        # db.close()
         print "true"
         return True
     except Exception, e:
@@ -108,7 +97,8 @@ def search(city, info, num=15):
         if i == 'aqi':
             pass
         if i == 'today':
-            today = db.today.find({"city": city}, {"_id": 0}).sort('time', pymongo.ASCENDING).limit(1)
+            today = db.today.find({"city": city}, {"_id": 0}).sort('time', -1).limit(1)
+            print city
             for _today in today:
                 result['today'] = _today
         if i == 'future':
@@ -124,6 +114,7 @@ if __name__ == '__main__':
     # spider('101010100')
     # print search('101010100', ['advice', 'aqi', 'today', 'future'], 15)
     try:
+        print 'start,listen 5556'
         while True:
             message = socket.recv_json()
             print message
