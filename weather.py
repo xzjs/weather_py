@@ -9,8 +9,7 @@ import platform
 import zmq
 
 sysstr = platform.system()
-# conn_host = '127.0.0.1' if sysstr == "Windows" else "172.17.0.1"
-conn_host = '111.230.21.59'
+conn_host = '127.0.0.1'
 conn = pymongo.MongoClient(conn_host, 27017)
 db = conn.weather
 # zmq
