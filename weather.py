@@ -30,7 +30,7 @@ def spider(str):
 
     try:
         '''今日天气'''
-        driver.get("http://www.weather.com.cn/weather1d/" + city + ".shtml")
+        driver.get("http://www.weather.com.cn/weather1d/" + str(city) + ".shtml")
         doc = pq(driver.page_source)
         today = {}
         today['update_time'] = doc('.ctop .time').text()  # "07:30更新 | 数据来源 中央气象台"
