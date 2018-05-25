@@ -9,18 +9,13 @@ import platform
 import zmq
 
 sysstr = platform.system()
-conn_host = '172.17.0.1'
+conn_host = '127.0.0.1'
 conn = pymongo.MongoClient(conn_host, 27017)
 db = conn.weather
-# zmq
-context = zmq.Context()
-socket = context.socket(zmq.REP)
-socket.bind("tcp://*:5556")
 
 
-def spider(str):
+def spider(city):
     '''爬虫函数'''
-    city = str
     sysstr = platform.system()
     print sysstr
     if sysstr == "Windows":
@@ -30,7 +25,7 @@ def spider(str):
 
     try:
         '''今日天气'''
-        driver.get("http://www.weather.com.cn/weather1d/" + str(city) + ".shtml")
+        driver.get("http://www.weather.com.cn/weather1d/" + city + ".shtml")
         doc = pq(driver.page_source)
         today = {}
         today['update_time'] = doc('.ctop .time').text()  # "07:30更新 | 数据来源 中央气象台"
@@ -43,7 +38,7 @@ def spider(str):
         today['wind'] = doc('.w').text()
         today['pollute'] = doc('.pol').text()
         # today['warning'] = doc('.wea-three03').find('span').text()
-        today['city'] = str
+        today['city'] = city
         today['time'] = time.time()
         my_set = db.today
         my_set.insert(today)
@@ -59,7 +54,7 @@ def spider(str):
             future['temp'] = li.find(".days-list-foot").find(".days-item-tem").find(".days-tem-day").text()  # 33°
             future['weather'] = li.find(".days-list-foot").find(".days-item-weather").find(
                 ".days-weather-right").text()  # 晴
-            future['city'] = str
+            future['city'] = city
             future['time'] = time.time()
             my_set = db.future
             my_set.insert(future)
@@ -71,7 +66,7 @@ def spider(str):
         advice = {}
         advice['today'] = today.split(' ')[0]  # 炎热
         advice['advice'] = doc("#datebox").text()  # 天气炎热，建议着短衫、短裙、短裤、薄型T恤衫等清凉夏季服装。
-        advice['city'] = str
+        advice['city'] = city
         advice['time'] = time.time()
         my_set = db.advice
         my_set.insert(advice)
@@ -110,6 +105,10 @@ def search(city, info, num=15):
 
 
 if __name__ == '__main__':
+    # zmq
+    context = zmq.Context()
+    socket = context.socket(zmq.REP)
+    socket.bind("tcp://*:5556")
     # spider('101010100')
     # print search('101010100', ['advice', 'aqi', 'today', 'future'], 15)
     try:
