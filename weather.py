@@ -7,6 +7,7 @@ from selenium import webdriver
 from pyquery import PyQuery as pq
 import platform
 import zmq
+import re
 
 sysstr = platform.system()
 conn_host = '127.0.0.1'
@@ -19,7 +20,7 @@ def spider(city):
     sysstr = platform.system()
     print sysstr
     if sysstr == "Windows":
-        driver = webdriver.PhantomJS(executable_path="phantomjs.exe")
+        driver = webdriver.phantomjs(executable_path="phantomjs.exe")
     else:
         driver = webdriver.PhantomJS(executable_path="./phantomjs")
 
@@ -32,9 +33,17 @@ def spider(city):
         today['update_time'] = today['update_time'].split('|')[0]  # 07:30更新
         weather_element = doc('.wea')
         today['weather'] = weather_element.eq(0).text() + u'转' + weather_element.eq(1).text()  # "晴间多云转晴转多云"
-        tem_element = doc('.tem span')
-        today['tempmax'] = tem_element.eq(1).text()  # 33
-        today['tempmin'] = tem_element.eq(2).text()  # 20
+        # tem_element = doc('.tem span')
+        # today['tempmax'] = tem_element.eq(1).text()  # 33
+        # today['tempmin'] = tem_element.eq(2).text()  # 20
+        tem_str = doc('#hidden_title').val()
+        search_obj = re.search(r'-?\d{1,2}/-?\d{1,2}', tem_str)
+        if search_obj:
+            tem_str = search_obj.group()
+            tem = tem_str.split('/')
+            today['tempmax'] = tem[0]
+            today['tempmin'] = tem[1]
+
         today['wind'] = doc('.w').text()
         today['pollute'] = doc('.pol').text()
         # today['warning'] = doc('.wea-three03').find('span').text()
