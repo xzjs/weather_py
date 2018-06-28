@@ -32,10 +32,13 @@ def spider(city):
         today['update_time'] = doc('.ctop .time').text()  # "07:30更新 | 数据来源 中央气象台"
         today['update_time'] = today['update_time'].split('|')[0]  # 07:30更新
         weather_element = doc('.wea')
-        today['weather'] = weather_element.eq(0).text() + u'转' + weather_element.eq(1).text()  # "晴间多云转晴转多云"
-        # tem_element = doc('.tem span')
-        # today['tempmax'] = tem_element.eq(1).text()  # 33
-        # today['tempmin'] = tem_element.eq(2).text()  # 20
+        weather1 = weather_element.eq(0).text()
+        weather2 = weather_element.eq(1).text()
+        if weather1 == weather2:
+            today['weather'] = weather1
+        else:
+            today['weather'] = weather1 + u'转' + weather2  # "晴间多云转晴转多云"
+
         tem_str = doc('#hidden_title').val()
         search_obj = re.search(r'-?\d{1,2}/-?\d{1,2}', tem_str)
         if search_obj:
